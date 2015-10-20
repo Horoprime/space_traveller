@@ -8,6 +8,7 @@ public class StartGame : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		game = new GameObject ();
+		game.name = "Game controller";
 		game.AddComponent<Controller> ();
 	}
 	

@@ -14,9 +14,11 @@ public struct GameInfo {
 public class Controller : MonoBehaviour {
 	
 	//main variables
+	GameObject playersContainer;
 	GameObject player;
 	GameObject[] players;
-	
+
+	GameObject cellsContainer;
 	GameObject[] cells;
 	//Different sprites for cell
 	Sprite cellHidden = new Sprite();
@@ -49,6 +51,8 @@ public class Controller : MonoBehaviour {
 		}
 
 		Destroy (player);
+		Destroy (cellsContainer);
+		Destroy (playersContainer);
 	}
 
 	// Use this for initialization
@@ -65,6 +69,8 @@ public class Controller : MonoBehaviour {
 		Debug.Log ("Seed: " + seed);
 		
 		//Initializing all players
+		playersContainer = new GameObject ();
+		playersContainer.name = "Players container";
 		players = new GameObject[GameInfo.playerNum];
 		for (int i = 0; i < players.Length; i++) {
 			players[i] = new GameObject();
@@ -78,6 +84,7 @@ public class Controller : MonoBehaviour {
 			players[i].GetComponent<SpriteRenderer> ().sprite = Resources.Load<Sprite> ("pitrizzo-SpaceShip-gpl3-opengameart-96x96");
 			players[i].GetComponent<SpriteRenderer> ().color = new Color(0.2f, 0.7f, 0.7f);
 			players[i].transform.localScale = new Vector3 (GameInfo.cellWidth, GameInfo.cellWidth, 1.0f);
+			players[i].transform.parent = playersContainer.transform;
 		}
 		
 		//Initializing main player
@@ -93,15 +100,18 @@ public class Controller : MonoBehaviour {
 		cellStar = Resources.Load<Sprite>("star 1");
 		
 		//Initializing cells
+		cellsContainer = new GameObject ();
+		cellsContainer.name = "Cells container";
 		cells = new GameObject[GameInfo.mapSize];
 		for (int i =0; i < cells.Length; i++) {
 			cells[i] = new GameObject();
 			float startX = GameInfo.cellWidth * (i/GameInfo.mapWidth) - Camera.main.orthographicSize + GameInfo.cellCenter;
 			float startY = GameInfo.cellWidth * (i%GameInfo.mapHeight) - Camera.main.orthographicSize + GameInfo.cellCenter;
 			cells[i].transform.position = new Vector3(startX, startY, 0.0f);
-			cells[i].name = ("cell " + (i/GameInfo.mapWidth) + (i%GameInfo.mapHeight));
+			cells[i].name = ("cell_" + (i/GameInfo.mapWidth) + "_" + (i%GameInfo.mapHeight));
 			cells[i].AddComponent<SpriteRenderer> ();
 			cells[i].transform.localScale = new Vector3 (GameInfo.cellWidth, GameInfo.cellWidth, 1.0f);
+			cells[i].transform.parent = cellsContainer.transform;
 		}
 	}
 	

@@ -26,17 +26,6 @@ public class PlayerMovement : MonoBehaviour {
 		shift = Camera.main.orthographicSize / 10;
 		borderCheck = Camera.main.orthographicSize - (shift / 2);
 		destination = transform.position;
-
-		//Initializing spaceship
-		int start = (int)Random.Range (0.0f, 400.0f);
-		float startX = (float)((int)(start/GameInfo.mapWidth) * GameInfo.cellWidth) + GameInfo.cellCenter - Camera.main.orthographicSize;
-		float startY = (float)((int)(start%GameInfo.mapHeight) * GameInfo.cellWidth) + GameInfo.cellCenter - Camera.main.orthographicSize;
-		transform.position = new Vector3 (startX, startY, 0.0f);
-
-		gameObject.AddComponent<SpriteRenderer> ();
-		GetComponent<SpriteRenderer> ().sprite = Resources.Load<Sprite> ("pitrizzo-SpaceShip-gpl3-opengameart-96x96");
-		GetComponent<SpriteRenderer> ().color = new Color(0.2f, 0.7f, 0.7f);
-		transform.localScale = new Vector3 (GameInfo.cellWidth, GameInfo.cellWidth, 1.0f);
 		//Debug.Log ("Started!");
 	}
 	

@@ -62,15 +62,24 @@ public class Controller : MonoBehaviour {
 		playersContainer.name = "Players container";
 		players = new GameObject[GameInfo.playerNum];
 		for (int i = 0; i < players.Length; i++) {
+			//Initializing spaceship
 			players[i] = new GameObject();
 			players[i].name = "player" + i;
 			players[i].AddComponent<PlayerMovement> ();
+			int start = (int)Random.Range (0.0f, 400.0f);
+			float startX = (float)((int)(start/GameInfo.mapWidth) * GameInfo.cellWidth) + GameInfo.cellCenter - Camera.main.orthographicSize;
+			float startY = (float)((int)(start%GameInfo.mapHeight) * GameInfo.cellWidth) + GameInfo.cellCenter - Camera.main.orthographicSize;
+			players[i].transform.position = new Vector3 (startX, startY, 0.0f);
+			players[i].AddComponent<SpriteRenderer> ();
+			players[i].GetComponent<SpriteRenderer> ().sprite = Resources.Load<Sprite> ("pitrizzo-SpaceShip-gpl3-opengameart-96x96");
+			players[i].GetComponent<SpriteRenderer> ().color = new Color(0.2f, 0.7f, 0.7f);
+			players[i].transform.localScale = new Vector3 (GameInfo.cellWidth, GameInfo.cellWidth, 1.0f);
 			players[i].transform.parent = playersContainer.transform;
 		}
 		
 		//Initializing main player
 		player = players [0];
-		player.transform.position = new Vector3 (0.0f + GameInfo.cellCenter, 0.0f + GameInfo.cellCenter, 0.0f);
+		player.transform.position = new Vector3 (0.0f + GameInfo.cellCenter, 0.0f + GameInfo.cellCenter, -0.1f);
 		player.GetComponent<PlayerMovement> ().isMain = true;
 		player.GetComponent<SpriteRenderer> ().color = new Color(1.0f, 1.0f, 1.0f);
 	}
@@ -111,9 +120,11 @@ public class Controller : MonoBehaviour {
 		//Changing main player
 		if (playerIndex > -1 && !players [playerIndex].GetComponent<PlayerMovement> ().isMain) {
 			player.GetComponent<SpriteRenderer> ().color = new Color(0.2f, 0.7f, 0.7f);
+			player.transform.position = new Vector3 (player.transform.position.x, player.transform.position.y, 0.0f);
 			player.GetComponent<PlayerMovement> ().isMain = false;
 			player = players[playerIndex];
 			player.GetComponent<SpriteRenderer> ().color = new Color(1.0f, 1.0f, 1.0f);
+			player.transform.position = new Vector3 (player.transform.position.x, player.transform.position.y, -0.1f);
 			player.GetComponent<PlayerMovement> ().isMain = true;
 		}
 	}

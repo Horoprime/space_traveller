@@ -20,8 +20,9 @@ public class PlayerMovement : MonoBehaviour {
 	float checkTime;
 	float checkDelay;
 	
-	//Initializing update variables
+
 	void Start () {
+		//Initializing update variables
 		shift = Camera.main.orthographicSize / 10;
 		borderCheck = Camera.main.orthographicSize - (shift / 2);
 		destination = transform.position;

@@ -55,24 +55,14 @@ public class Controller : MonoBehaviour {
 		Destroy (playersContainer);
 	}
 
-	// Use this for initialization
-	void Start () {
-		GameInfo.playerNum = 10;
-		GameInfo.mapHeight = 20;
-		GameInfo.mapWidth = 20;
-		GameInfo.viewRadius = 9.0f;
-		GameInfo.cellWidth = Camera.main.orthographicSize / 10;
-		GameInfo.cellCenter = Camera.main.orthographicSize / 20;
-		GameInfo.mapSize = GameInfo.mapWidth * GameInfo.mapHeight;
-		
-		seed = (int)(Random.Range (0.0f, 100.0f) * 1000);
-		Debug.Log ("Seed: " + seed);
-		
+	public void InitializePlayers()
+	{
 		//Initializing all players
 		playersContainer = new GameObject ();
 		playersContainer.name = "Players container";
 		players = new GameObject[GameInfo.playerNum];
 		for (int i = 0; i < players.Length; i++) {
+			//Initializing spaceship
 			players[i] = new GameObject();
 			players[i].name = "player" + i;
 			players[i].AddComponent<PlayerMovement> ();
@@ -89,10 +79,13 @@ public class Controller : MonoBehaviour {
 		
 		//Initializing main player
 		player = players [0];
-		player.transform.position = new Vector3 (0.0f + GameInfo.cellCenter, 0.0f + GameInfo.cellCenter, 0.0f);
+		player.transform.position = new Vector3 (0.0f + GameInfo.cellCenter, 0.0f + GameInfo.cellCenter, -0.1f);
 		player.GetComponent<PlayerMovement> ().isMain = true;
 		player.GetComponent<SpriteRenderer> ().color = new Color(1.0f, 1.0f, 1.0f);
-		
+	}
+
+	public void InitializeCells ()
+	{
 		//Loading sprites from Assets/Resources
 		cellHidden = Resources.Load<Sprite>("unseen3");
 		cellMeteor = Resources.Load<Sprite>("Asteroid");
@@ -114,26 +107,30 @@ public class Controller : MonoBehaviour {
 			cells[i].transform.parent = cellsContainer.transform;
 		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
+
+	public void ChangeMainPlayerIfNeeds()
+	{
 		//Checking if player is need to be changed;
 		int playerIndex = -1;
 		string inputValues = Input.inputString;
 		if (inputValues.Length > 0 && inputValues [0] >= '0' && inputValues [0] <= '9') {
 			playerIndex = (int)char.GetNumericValue(inputValues[0]);
 		}
-
+		
 		//Changing main player
 		if (playerIndex > -1 && !players [playerIndex].GetComponent<PlayerMovement> ().isMain) {
 			player.GetComponent<SpriteRenderer> ().color = new Color(0.2f, 0.7f, 0.7f);
+			player.transform.position = new Vector3 (player.transform.position.x, player.transform.position.y, 0.0f);
 			player.GetComponent<PlayerMovement> ().isMain = false;
 			player = players[playerIndex];
 			player.GetComponent<SpriteRenderer> ().color = new Color(1.0f, 1.0f, 1.0f);
+			player.transform.position = new Vector3 (player.transform.position.x, player.transform.position.y, -0.1f);
 			player.GetComponent<PlayerMovement> ().isMain = true;
 		}
+	}
 
-		Vector3 playerPos = player.transform.position;
+	public void CheckCellsVisability(Vector3 playerPos)
+	{
 		//Checking if cell is visible depending on view radius
 		for (int i =0; i < cells.Length; i++) {
 			Vector3 cellPos = cells[i].transform.position;
@@ -157,20 +154,49 @@ public class Controller : MonoBehaviour {
 					cells[i].GetComponent<SpriteRenderer> ().sprite = cellEmpty;
 			}
 		}
-		
+	}
+
+	public void CheckPlayersVisability(Vector3 playerPos)
+	{
 		//Checking if other players are visible
 		for (int i = 0; i < players.Length; i++) {
 			//Skipping main player
-			if (players[i].GetComponent<PlayerMovement>().isMain)
+			if (players [i].GetComponent<PlayerMovement> ().isMain)
 				continue;
-			Vector3 overPlPos = players[i].transform.position;
-			float distance = Mathf.Sqrt(Mathf.Pow(overPlPos.x - playerPos.x, 2.0f) + Mathf.Pow(overPlPos.y - playerPos.y, 2.0f));
+			Vector3 overPlPos = players [i].transform.position;
+			float distance = Mathf.Sqrt (Mathf.Pow (overPlPos.x - playerPos.x, 2.0f) + Mathf.Pow (overPlPos.y - playerPos.y, 2.0f));
 			if (distance > (GameInfo.viewRadius * (GameInfo.cellWidth))) {
-				players[i].GetComponent<SpriteRenderer> ().color = new Color();
-			}
-			else {
-				players[i].GetComponent<SpriteRenderer> ().color = new Color(0.2f, 0.7f, 0.7f);
+				players [i].GetComponent<SpriteRenderer> ().color = new Color ();
+			} else {
+				players [i].GetComponent<SpriteRenderer> ().color = new Color (0.2f, 0.7f, 0.7f);
 			}
 		}
+	}
+
+	// Use this for initialization
+	void Start () {
+		GameInfo.playerNum = 10;
+		GameInfo.mapHeight = 20;
+		GameInfo.mapWidth = 20;
+		GameInfo.viewRadius = 9.0f;
+		GameInfo.cellWidth = Camera.main.orthographicSize / 10;
+		GameInfo.cellCenter = Camera.main.orthographicSize / 20;
+		GameInfo.mapSize = GameInfo.mapWidth * GameInfo.mapHeight;
+		
+		seed = (int)(Random.Range (0.0f, 100.0f) * 1000);
+		Debug.Log ("Seed: " + seed);
+		
+		InitializePlayers ();
+		
+		InitializeCells ();
+	}
+	
+	// Update is called once per frame
+	void Update () {
+		ChangeMainPlayerIfNeeds ();
+
+		Vector3 playerPos = player.transform.position;
+		CheckCellsVisability (playerPos);
+		CheckPlayersVisability (playerPos);
 	}
 }
